@@ -7,15 +7,15 @@
   
   <title>C++ STL &lt;mutex&gt; | Rokugatsu</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="mutex引言mutex(mutual exclusion)是并发编程中一个非常重要的概念，C++11之后标准也提供了支持。与mutex相关的一系列类与函数被定义在头文件&lt;mutex&gt;中。      类 用途    mutex 提供基础的互斥元功能   timed_mutex 提供附带有计时的互斥元功能   recursive_mutex 提供可递归(可重入)的互斥元功能   lock">
+  <meta name="description" content="mutex引言mutex(mutual exclusion, 互斥元)是并发编程中一个非常重要的概念，它的保证了并发的情况下，多个线程对于收mutex保护的数据访问是排他性的。通俗地说，互斥元就是给数据加锁，这是解决数据竞争(data race)的一种基本理念。从C++11开始，标准库中也对mutex提供了支持，mutex相关的一系列类与函数被定义在头文件&lt;mutex&gt;中。下面列出的类">
 <meta property="og:type" content="article">
 <meta property="og:title" content="C++ STL &lt;mutex&gt;">
 <meta property="og:url" content="https://rokugatsu.github.io/2021/12/04/CPP-STL-mutex/index.html">
 <meta property="og:site_name" content="Rokugatsu">
-<meta property="og:description" content="mutex引言mutex(mutual exclusion)是并发编程中一个非常重要的概念，C++11之后标准也提供了支持。与mutex相关的一系列类与函数被定义在头文件&lt;mutex&gt;中。      类 用途    mutex 提供基础的互斥元功能   timed_mutex 提供附带有计时的互斥元功能   recursive_mutex 提供可递归(可重入)的互斥元功能   lock">
+<meta property="og:description" content="mutex引言mutex(mutual exclusion, 互斥元)是并发编程中一个非常重要的概念，它的保证了并发的情况下，多个线程对于收mutex保护的数据访问是排他性的。通俗地说，互斥元就是给数据加锁，这是解决数据竞争(data race)的一种基本理念。从C++11开始，标准库中也对mutex提供了支持，mutex相关的一系列类与函数被定义在头文件&lt;mutex&gt;中。下面列出的类">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2021-12-04T14:47:07.000Z">
-<meta property="article:modified_time" content="2021-12-04T15:59:22.131Z">
+<meta property="article:modified_time" content="2021-12-05T02:04:22.166Z">
 <meta property="article:author" content="LiPingan">
 <meta property="article:tag" content="cpp">
 <meta property="article:tag" content="stl">
@@ -107,7 +107,7 @@
     
     <div class="article-entry" itemprop="articleBody">
       
-        <h1 id="mutex"><a href="#mutex" class="headerlink" title="mutex"></a>mutex</h1><h2 id="引言"><a href="#引言" class="headerlink" title="引言"></a>引言</h2><p>mutex(mutual exclusion)是并发编程中一个非常重要的概念，C++11之后标准也提供了支持。与mutex相关的一系列类与函数被定义在头文件&lt;mutex&gt;中。  </p>
+        <h1 id="mutex"><a href="#mutex" class="headerlink" title="mutex"></a>mutex</h1><h2 id="引言"><a href="#引言" class="headerlink" title="引言"></a>引言</h2><p>mutex(mutual exclusion, 互斥元)是并发编程中一个非常重要的概念，它的保证了并发的情况下，多个线程对于收mutex保护的数据访问是排他性的。通俗地说，互斥元就是给数据加锁，这是解决数据竞争(data race)的一种基本理念。从C++11开始，标准库中也对mutex提供了支持，mutex相关的一系列类与函数被定义在头文件&lt;mutex&gt;中。下面列出的类和函数仅仅是一部分，从中可以看出，C++标准提供的互斥元机制与其他的语言大同小异，最大的区别可能就来源于C++自身的特性——RAII机制。</p>
 <table>
 <thead>
 <tr>
@@ -157,17 +157,28 @@
 </tr>
 <tr>
 <td>lock</td>
-<td>将mutex上锁</td>
+<td>可以同时给多个mutex上锁，并且能防止死锁</td>
 </tr>
 <tr>
 <td>call_once</td>
-<td>保证函数在并发条件下仅被调用一次，</td>
+<td>保证函数在并发条件下仅被调用一次</td>
 </tr>
 <tr>
 <td>std::swap</td>
-<td>unique_lock的特化函数</td>
+<td>unique_lock的特化版本</td>
 </tr>
 </tbody></table>
+<h2 id="std-mutex"><a href="#std-mutex" class="headerlink" title="std::mutex"></a>std::mutex</h2><p>在C++中，std::mutex提供了最基本的互斥机制，它的对外接口如下所示：</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">namespace</span> std &#123;</span><br><span class="line">  <span class="class"><span class="keyword">class</span> <span class="title">mutex</span> &#123;</span></span><br><span class="line">  <span class="keyword">public</span>:</span><br><span class="line">    <span class="function"><span class="keyword">constexpr</span> <span class="title">mutex</span><span class="params">()</span> <span class="keyword">noexcept</span></span>;</span><br><span class="line">    ~<span class="built_in">mutex</span>();</span><br><span class="line"> </span><br><span class="line">    <span class="built_in">mutex</span>(<span class="keyword">const</span> mutex&amp;) = <span class="keyword">delete</span>;</span><br><span class="line">    mutex&amp; <span class="keyword">operator</span>=(<span class="keyword">const</span> mutex&amp;) = <span class="keyword">delete</span>;</span><br><span class="line"> </span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">lock</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">bool</span> <span class="title">try_lock</span><span class="params">()</span></span>;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">unlock</span><span class="params">()</span></span>;</span><br><span class="line"> </span><br><span class="line">    <span class="keyword">using</span> native_handle_type = <span class="comment">/* implementation-defined */</span>;</span><br><span class="line">    <span class="function">native_handle_type <span class="title">native_handle</span><span class="params">()</span></span>;</span><br><span class="line">  &#125;;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>我们以发现，std::mutex提供了三个与加锁解锁相关的方法:</p>
+<ul>
+<li>lock()   </li>
+<li>unlock()</li>
+<li>try_lock()</li>
+</ul>
+<p>首先，线程可以通过调用lock()给std::mutex加锁，如果成功，则线程可以进入临界区(发生数据竞争的代码段)执行相关代码，如果失败，则线程会被阻塞。成功加锁的线程在离开临界区之后，可以调用unlock()进行解锁，后续的线程可以继续进行加锁。如果线程忘记调用unlock()，后果是十分严重的，因为后续的线程都会竞争失败。但是，unlock()也不是简单的调用一次就能万无一失，因为需要保证在任意一条控制流上都需要调用unlock()。对于复杂的代码逻辑来说，手动调用unlock()难免会出现纰漏。所幸，C++中的RAII机制给出了近乎完美的解决方法，这也是&lt;mutex&gt;提供了一系列RAII包装类的原因。try_lock()方法虽然也是给std::mutex加锁，但是它提供了一种更为灵活的方式。线程在调用try_lock()之后会得到一个bool类型的返回值，用于告诉线程是否加锁成功。这样一来，线程就可以根据结果来进入不同的控制流，而不是像lock()一样直接将竞争失败的线程阻塞。</p>
+<figure class="highlight c++"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> (mutex.<span class="built_in">try_lock</span>()) &#123;</span><br><span class="line">    <span class="comment">//加锁成功的代码路径</span></span><br><span class="line">&#125; <span class="keyword">else</span> &#123;</span><br><span class="line">    <span class="comment">//加锁失败的代码路径</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="std-timed-mutex"><a href="#std-timed-mutex" class="headerlink" title="std::timed_mutex"></a>std::timed_mutex</h2><h2 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h2><p>[0] <a target="_blank" rel="noopener" href="https://en.cppreference.com/w/cpp/header/mutex">https://en.cppreference.com/w/cpp/header/mutex</a><br>[1] </p>
 
       
     </div>
