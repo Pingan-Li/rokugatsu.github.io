@@ -15,7 +15,7 @@
 <meta property="og:description" content="Threadstd::threadTODO std::this_thread在编写线程相关的代码时，常常需要使用到“当前线程”这个语义。在C++中对当前线程进行操作的方法是调用std::this_thread中的成员。   std::this_thread是一个明明空间，里面定义的方法是自由函数，而不是隶属于某个类的成员函数。其中主要的方法有：| 函数">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2021-12-05T14:30:41.000Z">
-<meta property="article:modified_time" content="2021-12-10T15:51:47.456Z">
+<meta property="article:modified_time" content="2021-12-10T15:55:53.955Z">
 <meta property="article:author" content="LiPingan">
 <meta property="article:tag" content="cpp">
 <meta property="article:tag" content="stl">
@@ -110,7 +110,7 @@
       
         <h1 id="Thread"><a href="#Thread" class="headerlink" title="Thread"></a>Thread</h1><h2 id="std-thread"><a href="#std-thread" class="headerlink" title="std::thread"></a>std::thread</h2><p>TODO</p>
 <h2 id="std-this-thread"><a href="#std-this-thread" class="headerlink" title="std::this_thread"></a>std::this_thread</h2><p>在编写线程相关的代码时，常常需要使用到“当前线程”这个语义。在C++中对当前线程进行操作的方法是调用std::this_thread中的成员。  </p>
-<p>std::this_thread是一个明明空间，里面定义的方法是自由函数，而不是隶属于某个类的成员函数。其中主要的方法有：<br>| 函数                                                                                                           | 作用          |<br>| ————————————————————————————————————– | ————- |<br>| <code>thread::id get_id() noexcept;</code>                                                                                | 获取线程id    |<br>| <code>void yield() noexcept;</code>                                                                                       | 让出CPU执行权 |<br>| <code>template&lt;class Clock, class Duration&gt; void sleep_until(const chrono::time_point&lt;Clock, Duration&gt;&amp; abs_time);</code> | 控制线程sleep |<br>| <code>template&lt;class Rep, class Period&gt; void sleep_for(const chrono::duration&lt;Rep, Period&gt;&amp; rel_time);</code>             | 控制线程sleep |</p>
+<p>std::this_thread是一个明明空间，里面定义的方法是自由函数，而不是隶属于某个类的成员函数。其中主要的方法有：<br>| 函数                                                                                                         | 作用          |<br>| ———————————————————————————————————— | ————- |<br>| thread::id get_id() noexcept;                                                                                | 获取线程id    |<br>| void yield() noexcept;                                                                                       | 让出CPU执行权 |<br>| template&lt;class Clock, class Duration&gt; void sleep_until(const chrono::time_point&lt;Clock, Duration&gt;&amp; abs_time); | 控制线程sleep |<br>| template&lt;class Rep, class Period&gt; void sleep_for(const chrono::duration&lt;Rep, Period&gt;&amp; rel_time);             | 控制线程sleep |</p>
 <p>众所周知，C++中的线程库实际上是对系统提供的API进行统一抽象，很多的功能实际上依赖于操作系统的实现。这一点在上述的方法中也不例外，我们以GNU上的实现作为参照。 </p>
 <ol>
 <li>yeild()</li>
